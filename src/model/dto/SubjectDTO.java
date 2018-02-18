@@ -87,5 +87,4 @@ public class SubjectDTO {
 				+ state + ", date=" + date + ", credits=" + credits + ", name=" + name + "]";
 	}
 
-
 }

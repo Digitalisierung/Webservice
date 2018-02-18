@@ -251,6 +251,7 @@ public class EntityAccessPoint {
 			ap.setDatum(new Date());
 			ap.setProf(prof);
 			//ap.setPruefung(pruefung);
+
 		}
 		return null;
 	}

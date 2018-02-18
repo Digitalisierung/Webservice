@@ -37,6 +37,7 @@ public class PracticeExamRegisterProcess {
 	@Produces(MediaType.APPLICATION_JSON)
 	public IdDTO setPracticalWorkMark(IdDTO mark) {
 		return mark;
+
 	}
 
 }
