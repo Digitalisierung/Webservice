@@ -1,7 +1,10 @@
 package model.access;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -10,6 +13,9 @@ import javax.persistence.Query;
 import org.eclipse.persistence.exceptions.QueryException;
 
 import controller.exception.SaveFailedException;
+import model.dto.SubjectDTO;
+import model.entitys.Aktuellepruefung;
+import model.entitys.Angemeldetepruefung;
 import model.entitys.Aushang;
 import model.entitys.Professor;
 import model.entitys.Student;
@@ -199,6 +205,54 @@ public class EntityAccessPoint {
 
 	}
 
-
+	public List<SubjectDTO> getListOfSubjects(Integer matrikelnummer){
+		List<SubjectDTO> ls = new ArrayList<SubjectDTO>();
+		Query query = em.createQuery(
+				"SELECT a.teilnehmer.matrikelnummer, g.note, g.versuch, a.status, b.datum, p.credits, p.name "
+				+ "FROM GeschriebenePruefungen g "
+				+ "JOIN Angemeldetepruefung a ON g.statedTest.id=a.id "
+				+ "JOIN Aktuellepruefung b ON a.aktuellePruefung.id=b.id "
+				+ "JOIN Pruefungen p ON b.pruefung.id=p.id "
+				+ "WHERE a.teilnehmer.matrikelnummer=" + matrikelnummer
+				);
+		
+		@SuppressWarnings("unchecked")
+		List<Object[]> result = query.getResultList();
+		
+		for(Object[] o : result) {
+			ls.add(new SubjectDTO(
+					(Number)o[0], 
+					(Number)o[1], 
+					(Number)o[2], 
+					(Number)o[3], 
+					o[4].toString(), 
+					(Number)o[5], 
+					(String)o[6]
+							)
+					);
+		}
+		return ls;
+	}
+	
+	public Object setCurrentExam(String email) {
+		Professor prof = getProfessor(email);
+		Query query = em.createQuery("SELECT a FROM Angemeldetepruefung a");
+		@SuppressWarnings("unchecked")
+		List<Angemeldetepruefung> ls = (List<Angemeldetepruefung>)query.getResultList();
+		Set<Angemeldetepruefung> set = new HashSet<Angemeldetepruefung>();
+		
+		for(Angemeldetepruefung ap : ls) {
+			set.add(ap);
+		}
+		
+		if(prof != null) {
+			Aktuellepruefung ap = new Aktuellepruefung();
+			ap.setAngemeldetePruefunge(set);
+			ap.setDatum(new Date());
+			ap.setProf(prof);
+			//ap.setPruefung(pruefung);
+		}
+		return null;
+	}
 
 }

@@ -13,6 +13,7 @@ import model.access.EntityAccessPoint;
 import model.dto.AdvertisementDTO;
 import model.dto.IdDTO;
 import model.dto.SelectedThesisThemeDTO;
+import model.dto.SubjectDTO;
 import model.entitys.Aushang;
 import model.entitys.Professor;
 import model.entitys.Student;
@@ -173,6 +174,9 @@ public class EntityAccessBroker {
 		return eap.deleteVorgemAushangBy(id);
 	}
 
-
+	
+	public List<SubjectDTO> getListOfSubjects(Integer matrikelnummer) {
+		return eap.getListOfSubjects(matrikelnummer);
+	}
 
 }

@@ -28,13 +28,13 @@ public class Pruefungen implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 
-	@Column(name="credits")
+	@Column(name="Credits")
 	private Integer credits;
 
-	@Column(name="fachbereich")
+	@Column(name="Fachbereich")
 	private String fachbereich;
 
-	@Column(name="name")
+	@Column(name="Studienfaecher")
 	private String name;
 
 	@Column(name="Semester")
