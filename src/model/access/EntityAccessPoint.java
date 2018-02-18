@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import org.eclipse.persistence.exceptions.QueryException;
 
 import controller.exception.SaveFailedException;
+import model.dto.SubjectDTO;
 import model.entitys.Aushang;
 import model.entitys.Professor;
 import model.entitys.Student;
@@ -199,6 +200,18 @@ public class EntityAccessPoint {
 
 	}
 
-
+	public List<Object> getEtwasZurueck(){
+		List<SubjectDTO> ls = new ArrayList<SubjectDTO>();
+		Query query = em.createQuery("SELECT o.name, o.matrikelnummer "
+				+ "FROM GeschriebenePruefungen g "
+				+ "JOIN Aktuellepruefung a ON g.aktuellepruefung.id=a.id");
+		
+		List<Object[]> result = query.getResultList();
+		
+		for(Object[] o : result) {
+			ls.add(new SubjectDTO());
+		}
+		return null;
+	}
 
 }
