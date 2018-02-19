@@ -255,5 +255,9 @@ public class EntityAccessPoint {
 		}
 		return null;
 	}
+	
+	public void example(Integer id) {
+		
+	}
 
 }
