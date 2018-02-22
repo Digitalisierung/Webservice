@@ -1,7 +1,5 @@
 package model.dto;
 
-import java.util.Date;
-
 public class PruefungDTO {
 	
 	private Number id;
