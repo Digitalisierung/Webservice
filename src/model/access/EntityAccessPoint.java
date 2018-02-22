@@ -170,17 +170,14 @@ public class EntityAccessPoint {
 	public VorgemerkteAushaenge getApprovalThesisByStudentID(Integer matrikelnummer) {
 		VorgemerkteAushaenge va = null;
 
-		Query query = em.createQuery("SELECT v FROM VorgemerkteAushaenge v " + "WHERE v.student.id="
+		Query query = em.createQuery("SELECT v FROM VorgemerkteAushaenge v WHERE v.student.matrikelnummer="
 				+ matrikelnummer + " AND v.betreuerEinverstanden=1");
 
-		List<VorgemerkteAushaenge> ls = new ArrayList<VorgemerkteAushaenge>();
+		@SuppressWarnings("unchecked")
+		List<VorgemerkteAushaenge> ls = query.getResultList();
 
-		while (query.getResultList().iterator().hasNext()) {
-			ls.add((VorgemerkteAushaenge) query.getResultList().iterator().next());
-		}
-
-		if (!ls.isEmpty()) {
-			va = ls.get(0);
+		for(VorgemerkteAushaenge v : ls) {
+			va = v;
 		}
 
 		return va;

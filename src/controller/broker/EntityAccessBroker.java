@@ -176,12 +176,11 @@ public class EntityAccessBroker {
 		return eap.deleteVorgemAushangBy(id);
 	}
 
-	
 	public List<SubjectDTO> getListOfSubjects(Integer matrikelnummer) {
 		return eap.getListOfSubjects(matrikelnummer);
 	}
 	
-	public void getApprovalThesisThemenByStudentID(Integer matrikelnummer) {
+	public ApprovalPracticalExamDTO getApprovalThesisThemenByStudentID(Integer matrikelnummer) {
 		VorgemerkteAushaenge va = eap.getApprovalThesisByStudentID(matrikelnummer);
 		Aushang aus = va.getAushang();
 		Professor prof = aus.getProfessor();
@@ -190,6 +189,14 @@ public class EntityAccessBroker {
 		
 		apedto.setDegree(aus.getSchwierigkeitsgrad());
 		apedto.setDescription(aus.getBeschreibung());
+		apedto.setProfAgreed(va.getBetreuerEinverstanden());
+		apedto.setProfEmail(prof.getEmail());
+		apedto.setProfForename(prof.getVorname());
+		apedto.setProfName(prof.getName());
+		apedto.setProfTitel(prof.getTitel());
+		apedto.setTopic(aus.getTitel());
+		
+		return apedto;
 		
 	}
 

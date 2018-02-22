@@ -40,9 +40,10 @@ public class PracticeExamRegisterProcess {
 	@Path("register")
 	@Produces(MediaType.APPLICATION_JSON)
 	public ApprovalPracticalExamDTO registerPracticalExam(IdDTO flag) {
-		flag.setId(1);
-		//broker.surchStudent(flag);
-		return flag;
+		
+		ApprovalPracticalExamDTO o = broker.getApprovalThesisThemenByStudentID(flag.getId());
+		return o;
+		
 	}
 	
 	
