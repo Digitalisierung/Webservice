@@ -126,7 +126,7 @@ public class ThesisChooseProcess {
 	public Integer deaktivateAdvertisement(IdDTO id) {
 		Integer count = 0;
 		try {
-			count = broker.method(id);
+			count = broker.deactivateAdvertisementByID(id);
 		}catch(SaveFailedException e) {
 			
 		}

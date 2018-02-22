@@ -31,7 +31,7 @@ public class EntityAccessBroker {
 		this.eap = new EntityAccessPoint(em);
 	}
 
-	public Integer method(IdDTO id) throws SaveFailedException {
+	public Integer deactivateAdvertisementByID(IdDTO id) throws SaveFailedException {
 		Integer count = 0;
 		count = eap.setAushangEntryInaktiv(id.getId());
 
@@ -41,7 +41,7 @@ public class EntityAccessBroker {
 	public AdvertisementDTO storeAdvertisement(AdvertisementDTO announce) {
 		Integer id;
 		Aushang aushang = new Aushang();
-		Professor prof = eap.getProfessor(announce.getProfessor());
+		Professor prof = eap.getProfessorByEmail(announce.getProfessor());
 
 		if (prof == null) {
 			// throw new Exception();
@@ -69,7 +69,7 @@ public class EntityAccessBroker {
 		VorgemerkteAushaenge va = new VorgemerkteAushaenge();
 
 		try {
-			student = eap.findStudent((Integer) selExams.getMatrikelnummer().intValue());
+			student = eap.getStudentBy((Integer) selExams.getMatrikelnummer().intValue());
 			aushang = eap.findAushang((Integer) selExams.getAushangId().intValue());
 
 			va.setAushang(aushang);
@@ -90,7 +90,7 @@ public class EntityAccessBroker {
 
 	public List<AdvertisementDTO> findAllActiveAdvertisementsOf(String emal) {
 
-		Professor prof = eap.getProfessor(emal);
+		Professor prof = eap.getProfessorByEmail(emal);
 		List<Aushang> aushang = eap.getAushangsListOf(prof.getId());
 		List<AdvertisementDTO> advs = new ArrayList<AdvertisementDTO>();
 

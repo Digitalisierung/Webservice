@@ -17,6 +17,9 @@ import model.dto.SubjectDTO;
 public class PracticeExamRegisterProcess {
 	EntityAccessBroker broker = new EntityAccessBroker();
 	
+	/*
+	 * 
+	 */
 	@GET
 	@Path("approval/{matrikel}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -28,6 +31,8 @@ public class PracticeExamRegisterProcess {
 	@Path("register")
 	@Produces(MediaType.APPLICATION_JSON)
 	public IdDTO registerPracticalExam(IdDTO flag) {
+		flag.setId(1);
+		//broker.surchStudent(flag);
 		return flag;
 	}
 	

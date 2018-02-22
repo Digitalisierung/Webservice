@@ -1,7 +1,13 @@
 package model.dto;
 
-public class SubjectDTO {
+import java.io.Serializable;
+
+public class SubjectDTO implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Number matrikelnumber;	
 	private Number mark; 
 	private Number attemt; 

@@ -17,7 +17,9 @@ import model.dto.SubjectDTO;
 import model.entitys.Aktuellepruefung;
 import model.entitys.Angemeldetepruefung;
 import model.entitys.Aushang;
+import model.entitys.GeschriebenePruefungen;
 import model.entitys.Professor;
+import model.entitys.Pruefungen;
 import model.entitys.Student;
 import model.entitys.VorgemerkteAushaenge;
 import model.exceptions.EntryNotFoundException;
@@ -79,7 +81,7 @@ public class EntityAccessPoint {
 
 	}
 
-	public Professor getProfessor(String email) {
+	public Professor getProfessorByEmail(String email) {
 		Query query = em.createQuery("SELECT p FROM Professor p WHERE p.email LIKE '" + email + "'");
 
 		@SuppressWarnings("unchecked")
@@ -94,6 +96,123 @@ public class EntityAccessPoint {
 		}
 
 		return prof;
+	}
+	
+	
+	public Professor getProfessorByID(Integer id) {
+		Professor prof = em.find(Professor.class, id);
+		
+		if(prof == null) {
+			// throw new Exception()
+		}
+		
+		return prof;
+	}
+
+	public List<Aushang> getAushangsListOf(Integer id) {
+		Query query = em.createQuery("SELECT a FROM Aushang a WHERE a.professor.id=" + id + " AND a.aktiv=1");
+		@SuppressWarnings("unchecked")
+		List<Aushang> aushaenge = (List<Aushang>) query.getResultList();
+
+		if (aushaenge == null) {
+			aushaenge = new ArrayList<Aushang>();
+		}
+
+		return aushaenge;
+	}
+
+	public List<Aushang> getAllAktiveAushangs() {
+		Query query = em.createQuery("SELECT a FROM Aushang a WHERE a.aktiv=1");
+		@SuppressWarnings("unchecked")
+		List<Aushang> aushaenge = (List<Aushang>) query.getResultList();
+
+		if (aushaenge == null) {
+			aushaenge = new ArrayList<Aushang>();
+		}
+
+		return aushaenge;
+	}
+
+	public List<SubjectDTO> getListOfSubjects(Integer matrikelnummer) {
+		List<SubjectDTO> ls = new ArrayList<SubjectDTO>();
+		Query query = em.createQuery(
+				"SELECT a.teilnehmer.matrikelnummer, g.note, g.versuch, a.status, b.datum, p.credits, p.name "
+						+ "FROM GeschriebenePruefungen g " 
+						+ "JOIN Angemeldetepruefung a ON g.statedTest.id=a.id "
+						+ "JOIN Aktuellepruefung b ON a.aktuellePruefung.id=b.id "
+						+ "JOIN Pruefungen p ON b.pruefung.id=p.id " + "WHERE a.teilnehmer.matrikelnummer="
+						+ matrikelnummer);
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> result = query.getResultList();
+
+		for (Object[] o : result) {
+			ls.add(new SubjectDTO((Number) o[0], (Number) o[1], (Number) o[2], (Number) o[3], o[4].toString(),
+					(Number) o[5], (String) o[6]));
+		}
+		return ls;
+	}
+
+	public Student getStudentBy(Integer matrikelnummer) throws EntryNotFoundException {
+		Student student = em.find(Student.class, matrikelnummer);
+	
+		if (student == null) {
+			throw new EntryNotFoundException("Student mit id=" + matrikelnummer + " gibt einen null-Wert zurück.");
+		}
+	
+		return student;
+	}
+
+	public VorgemerkteAushaenge getChoosedThesisFor(Student student) {
+		VorgemerkteAushaenge va = null;
+		
+		Query query = em.createQuery("SELECT v FROM VorgemerkteAushaenge v "
+				+ "WHERE v.student.id=" + student.getMatrikelnummer() + " AND v.betreuerEinverstanden=1");
+		
+		List<VorgemerkteAushaenge> ls = new ArrayList<VorgemerkteAushaenge>();
+		
+		while(query.getResultList().iterator().hasNext()) {
+			ls.add((VorgemerkteAushaenge)query.getResultList().iterator().next());
+		}
+		
+		if(!ls.isEmpty()) {
+			va = ls.get(0);
+		}
+	
+		return va;
+	
+	}
+
+	public Integer setAushangEntryInaktiv(Integer id) {
+		Integer count = 0;
+		Query query = em.createQuery("UPDATE Aushang a SET a.aktiv=false WHERE a.id=" + id);
+		em.getTransaction().begin();
+		count = query.executeUpdate();
+		em.getTransaction().commit();
+
+		return count;
+	}
+
+	public Object setCurrentExam(String email) {
+		Professor prof = getProfessorByEmail(email);
+		Query query = em.createQuery("SELECT a FROM Angemeldetepruefung a");
+		@SuppressWarnings("unchecked")
+		List<Angemeldetepruefung> ls = (List<Angemeldetepruefung>) query.getResultList();
+		Set<Angemeldetepruefung> set = new HashSet<Angemeldetepruefung>();
+
+		for (Angemeldetepruefung ap : ls) {
+			set.add(ap);
+		}
+
+		if (prof != null) {
+			Aktuellepruefung ap = new Aktuellepruefung();
+			ap.setAngemeldetePruefunge(set);
+			ap.setDatum(new Date());
+			ap.setProf(prof);
+			// ap.setPruefung(pruefung);
+
+		}
+		return null;
 	}
 
 	public Integer saveAushang(Aushang aushang) {
@@ -126,40 +245,6 @@ public class EntityAccessPoint {
 
 	}
 
-	public List<Aushang> getAushangsListOf(Integer id) {
-		Query query = em.createQuery("SELECT a FROM Aushang a WHERE a.professor.id=" + id + " AND a.aktiv=1");
-		@SuppressWarnings("unchecked")
-		List<Aushang> aushaenge = (List<Aushang>) query.getResultList();
-
-		if (aushaenge == null) {
-			aushaenge = new ArrayList<Aushang>();
-		}
-
-		return aushaenge;
-	}
-
-	public List<Aushang> getAllAktiveAushangs() {
-		Query query = em.createQuery("SELECT a FROM Aushang a WHERE a.aktiv=1");
-		@SuppressWarnings("unchecked")
-		List<Aushang> aushaenge = (List<Aushang>) query.getResultList();
-
-		if (aushaenge == null) {
-			aushaenge = new ArrayList<Aushang>();
-		}
-
-		return aushaenge;
-	}
-
-	public Student findStudent(Integer id) throws EntryNotFoundException {
-		Student s = em.find(Student.class, id);
-
-		if (s == null) {
-			throw new EntryNotFoundException("Student mit id=" + id + " gibt einen null-Wert zurück.");
-		}
-
-		return s;
-	}
-
 	public Aushang findAushang(Integer id) throws EntryNotFoundException {
 		Aushang a = em.find(Aushang.class, id);
 
@@ -173,16 +258,6 @@ public class EntityAccessPoint {
 	public VorgemerkteAushaenge findVorgemerkterAushang(Integer id) {
 		return em.find(VorgemerkteAushaenge.class, id);
 
-	}
-
-	public Integer setAushangEntryInaktiv(Integer id) {
-		Integer count = 0;
-		Query query = em.createQuery("UPDATE Aushang a SET a.aktiv=false WHERE a.id=" + id);
-		em.getTransaction().begin();
-		count = query.executeUpdate();
-		em.getTransaction().commit();
-
-		return count;
 	}
 
 	public Boolean deleteVorgemAushangBy(Integer id) {
@@ -203,57 +278,6 @@ public class EntityAccessPoint {
 
 		return flag;
 
-	}
-
-	public List<SubjectDTO> getListOfSubjects(Integer matrikelnummer){
-		List<SubjectDTO> ls = new ArrayList<SubjectDTO>();
-		Query query = em.createQuery(
-				"SELECT a.teilnehmer.matrikelnummer, g.note, g.versuch, a.status, b.datum, p.credits, p.name "
-				+ "FROM GeschriebenePruefungen g "
-				+ "JOIN Angemeldetepruefung a ON g.statedTest.id=a.id "
-				+ "JOIN Aktuellepruefung b ON a.aktuellePruefung.id=b.id "
-				+ "JOIN Pruefungen p ON b.pruefung.id=p.id "
-				+ "WHERE a.teilnehmer.matrikelnummer=" + matrikelnummer
-				);
-		
-		@SuppressWarnings("unchecked")
-		List<Object[]> result = query.getResultList();
-		
-		for(Object[] o : result) {
-			ls.add(new SubjectDTO(
-					(Number)o[0], 
-					(Number)o[1], 
-					(Number)o[2], 
-					(Number)o[3], 
-					o[4].toString(), 
-					(Number)o[5], 
-					(String)o[6]
-							)
-					);
-		}
-		return ls;
-	}
-	
-	public Object setCurrentExam(String email) {
-		Professor prof = getProfessor(email);
-		Query query = em.createQuery("SELECT a FROM Angemeldetepruefung a");
-		@SuppressWarnings("unchecked")
-		List<Angemeldetepruefung> ls = (List<Angemeldetepruefung>)query.getResultList();
-		Set<Angemeldetepruefung> set = new HashSet<Angemeldetepruefung>();
-		
-		for(Angemeldetepruefung ap : ls) {
-			set.add(ap);
-		}
-		
-		if(prof != null) {
-			Aktuellepruefung ap = new Aktuellepruefung();
-			ap.setAngemeldetePruefunge(set);
-			ap.setDatum(new Date());
-			ap.setProf(prof);
-			//ap.setPruefung(pruefung);
-
-		}
-		return null;
 	}
 
 }
