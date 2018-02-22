@@ -58,6 +58,7 @@ public class Aktuellepruefung implements Serializable {
 	private Set<Angemeldetepruefung> angemeldetePruefunge;
 
 	public Aktuellepruefung() {
+		
 	}
 
 	public Integer getId() {

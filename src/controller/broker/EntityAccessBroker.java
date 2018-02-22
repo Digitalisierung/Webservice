@@ -21,6 +21,7 @@ import model.entitys.VorgemerkteAushaenge;
 import model.exceptions.EntryNotFoundException;
 
 public class EntityAccessBroker {
+	
 	private EntityManagerFactory emf;
 	private EntityManager em;
 	private EntityAccessPoint eap;
