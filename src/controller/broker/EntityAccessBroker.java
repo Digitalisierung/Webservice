@@ -11,6 +11,7 @@ import javax.persistence.Persistence;
 import controller.exception.SaveFailedException;
 import model.access.EntityAccessPoint;
 import model.dto.AdvertisementDTO;
+import model.dto.ApprovalPracticalExamDTO;
 import model.dto.IdDTO;
 import model.dto.SelectedThesisThemeDTO;
 import model.dto.SubjectDTO;
@@ -92,7 +93,7 @@ public class EntityAccessBroker {
 	public List<AdvertisementDTO> findAllActiveAdvertisementsOf(String emal) {
 
 		Professor prof = eap.getProfessorByEmail(emal);
-		List<Aushang> aushang = eap.getAushangsListOf(prof.getId());
+		List<Aushang> aushang = eap.getAushangsListByProfessorID(prof.getId());
 		List<AdvertisementDTO> advs = new ArrayList<AdvertisementDTO>();
 
 		for (Aushang a : aushang) {
@@ -178,6 +179,18 @@ public class EntityAccessBroker {
 	
 	public List<SubjectDTO> getListOfSubjects(Integer matrikelnummer) {
 		return eap.getListOfSubjects(matrikelnummer);
+	}
+	
+	public void getApprovalThesisThemenByStudentID(Integer matrikelnummer) {
+		VorgemerkteAushaenge va = eap.getApprovalThesisByStudentID(matrikelnummer);
+		Aushang aus = va.getAushang();
+		Professor prof = aus.getProfessor();
+		
+		ApprovalPracticalExamDTO apedto = new ApprovalPracticalExamDTO();
+		
+		apedto.setDegree(aus.getSchwierigkeitsgrad());
+		apedto.setDescription(aus.getBeschreibung());
+		
 	}
 
 }

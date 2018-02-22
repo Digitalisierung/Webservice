@@ -1,6 +1,6 @@
 package model.dto;
 
-public class PracticalExamRegisterDTO {
+public class ApprovalPracticalExamDTO {
 	private String topic;
 	private String description;
 	private Number degree;
@@ -13,7 +13,7 @@ public class PracticalExamRegisterDTO {
 	private Number profAgreed;
 	
 	
-	public PracticalExamRegisterDTO() {
+	public ApprovalPracticalExamDTO() {
 		
 	}
 

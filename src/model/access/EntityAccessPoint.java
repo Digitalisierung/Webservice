@@ -93,19 +93,18 @@ public class EntityAccessPoint {
 
 		return prof;
 	}
-	
-	
+
 	public Professor getProfessorByID(Integer id) {
 		Professor prof = em.find(Professor.class, id);
-		
-		if(prof == null) {
+
+		if (prof == null) {
 			// throw new Exception()
 		}
-		
+
 		return prof;
 	}
 
-	public List<Aushang> getAushangsListOf(Integer id) {
+	public List<Aushang> getAushangsListByProfessorID(Integer id) {
 		Query query = em.createQuery("SELECT a FROM Aushang a WHERE a.professor.id=" + id + " AND a.aktiv=1");
 		@SuppressWarnings("unchecked")
 		List<Aushang> aushaenge = (List<Aushang>) query.getResultList();
@@ -115,6 +114,16 @@ public class EntityAccessPoint {
 		}
 
 		return aushaenge;
+	}
+	
+	public Aushang getAushangByID(Integer id) {
+		Aushang aus = em.find(Aushang.class, id);
+		
+		if(aus == null) {
+			// throw new Exception()
+		}
+		
+		return aus;
 	}
 
 	public List<Aushang> getAllAktiveAushangs() {
@@ -133,11 +142,9 @@ public class EntityAccessPoint {
 		List<SubjectDTO> ls = new ArrayList<SubjectDTO>();
 		Query query = em.createQuery(
 				"SELECT a.teilnehmer.matrikelnummer, g.note, g.versuch, a.status, b.datum, p.credits, p.name "
-						+ "FROM GeschriebenePruefungen g " 
-						+ "JOIN Angemeldetepruefung a ON g.statedTest.id=a.id "
+						+ "FROM GeschriebenePruefungen g " + "JOIN Angemeldetepruefung a ON g.statedTest.id=a.id "
 						+ "JOIN Aktuellepruefung b ON a.aktuellePruefung.id=b.id "
-						+ "JOIN Pruefungen p ON b.pruefung.id=p.id " 
-						+ "WHERE a.teilnehmer.matrikelnummer="
+						+ "JOIN Pruefungen p ON b.pruefung.id=p.id " + "WHERE a.teilnehmer.matrikelnummer="
 						+ matrikelnummer);
 
 		@SuppressWarnings("unchecked")
@@ -152,32 +159,32 @@ public class EntityAccessPoint {
 
 	public Student getStudentBy(Integer matrikelnummer) throws EntryNotFoundException {
 		Student student = em.find(Student.class, matrikelnummer);
-	
+
 		if (student == null) {
 			throw new EntryNotFoundException("Student mit id=" + matrikelnummer + " gibt einen null-Wert zurück.");
 		}
-	
+
 		return student;
 	}
 
-	public VorgemerkteAushaenge getChoosedThesisFor(Student student) {
+	public VorgemerkteAushaenge getApprovalThesisByStudentID(Integer matrikelnummer) {
 		VorgemerkteAushaenge va = null;
-		
-		Query query = em.createQuery("SELECT v FROM VorgemerkteAushaenge v "
-				+ "WHERE v.student.id=" + student.getMatrikelnummer() + " AND v.betreuerEinverstanden=1");
-		
+
+		Query query = em.createQuery("SELECT v FROM VorgemerkteAushaenge v " + "WHERE v.student.id="
+				+ matrikelnummer + " AND v.betreuerEinverstanden=1");
+
 		List<VorgemerkteAushaenge> ls = new ArrayList<VorgemerkteAushaenge>();
-		
-		while(query.getResultList().iterator().hasNext()) {
-			ls.add((VorgemerkteAushaenge)query.getResultList().iterator().next());
+
+		while (query.getResultList().iterator().hasNext()) {
+			ls.add((VorgemerkteAushaenge) query.getResultList().iterator().next());
 		}
-		
-		if(!ls.isEmpty()) {
+
+		if (!ls.isEmpty()) {
 			va = ls.get(0);
 		}
-	
+
 		return va;
-	
+
 	}
 
 	public Integer setAushangEntryInaktiv(Integer id) {
@@ -276,6 +283,5 @@ public class EntityAccessPoint {
 		return flag;
 
 	}
-
 
 }

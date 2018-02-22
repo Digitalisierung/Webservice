@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import controller.broker.EntityAccessBroker;
+import model.dto.ApprovalPracticalExamDTO;
 import model.dto.IdDTO;
 import model.dto.SubjectDTO;
 
@@ -18,7 +19,9 @@ public class PracticeExamRegisterProcess {
 	EntityAccessBroker broker = new EntityAccessBroker();
 	
 	/*
-	 * 
+	 * Prozess: Zulassung prüfen
+	 * Beschreibung:
+	 * 			Eine Liste aller bestandenen Prüfungen die ein Student bestanden hat, wird zurueckgegeben
 	 */
 	@GET
 	@Path("approval/{matrikel}")
@@ -27,10 +30,16 @@ public class PracticeExamRegisterProcess {
 		return broker.getListOfSubjects(matrikelnummer);
 	}
 	
+	
+	/*
+	 * Prozess: Praxisprojekt anmelden
+	 * Beschreibung:
+	 * 			
+	 */
 	@POST
 	@Path("register")
 	@Produces(MediaType.APPLICATION_JSON)
-	public IdDTO registerPracticalExam(IdDTO flag) {
+	public ApprovalPracticalExamDTO registerPracticalExam(IdDTO flag) {
 		flag.setId(1);
 		//broker.surchStudent(flag);
 		return flag;
