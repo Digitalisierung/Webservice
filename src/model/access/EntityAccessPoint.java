@@ -10,16 +10,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-import org.eclipse.persistence.exceptions.QueryException;
-
 import controller.exception.SaveFailedException;
 import model.dto.SubjectDTO;
 import model.entitys.Aktuellepruefung;
 import model.entitys.Angemeldetepruefung;
 import model.entitys.Aushang;
-import model.entitys.GeschriebenePruefungen;
 import model.entitys.Professor;
-import model.entitys.Pruefungen;
 import model.entitys.Student;
 import model.entitys.VorgemerkteAushaenge;
 import model.exceptions.EntryNotFoundException;
@@ -32,7 +28,7 @@ public class EntityAccessPoint {
 		this.em = em;
 	}
 
-	public Aushang updateDataBase(Aushang aushang) throws EntryNotFoundException, QueryException, SaveFailedException {
+	public Aushang updateDataBase(Aushang aushang) throws EntryNotFoundException, SaveFailedException {
 		Aushang a;
 		Integer count = 0;
 		Integer id = aushang.getId();
@@ -140,7 +136,8 @@ public class EntityAccessPoint {
 						+ "FROM GeschriebenePruefungen g " 
 						+ "JOIN Angemeldetepruefung a ON g.statedTest.id=a.id "
 						+ "JOIN Aktuellepruefung b ON a.aktuellePruefung.id=b.id "
-						+ "JOIN Pruefungen p ON b.pruefung.id=p.id " + "WHERE a.teilnehmer.matrikelnummer="
+						+ "JOIN Pruefungen p ON b.pruefung.id=p.id " 
+						+ "WHERE a.teilnehmer.matrikelnummer="
 						+ matrikelnummer);
 
 		@SuppressWarnings("unchecked")
@@ -279,5 +276,6 @@ public class EntityAccessPoint {
 		return flag;
 
 	}
+
 
 }
