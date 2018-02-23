@@ -37,7 +37,7 @@ public class RegisterExam {
 		System.out.println("Vor dem Select");
 		
 		@SuppressWarnings("unchecked")
-		List<Object[]> result = em.createQuery("SELECT p.id, p.name, b.aufsicht, b.datum, b.raum "
+		List<Object[]> result = em.createQuery("SELECT b.id, p.name, b.aufsicht, b.datum, b.raum "
 				+ "FROM Pruefungen p "
 				+ "JOIN Aktuellepruefung b ON p.id=b.pruefung.id").getResultList();
 		
@@ -123,36 +123,51 @@ public class RegisterExam {
 	@Path("checktestate/{id}")
 	public List<Number> checkTestat(@PathParam("id") Integer id) {
 		
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
-		this.em = emf.createEntityManager();
-		/*
-		 * 
+		/* 
 		 *  SELECT d.`id` 
 			FROM  `angemeldetepruefung` d
 			JOIN  `aktuellepruefung` c ON d.`akt_id` = c.`id` 
-			LEFT JOIN  `testat` t ON c.`pruefung_id` = t.`pruefung_id` 
-			WHERE t.`pruefung_id` IS NULL 
+			WHERE NOT 
+			EXISTS (
+			SELECT t.`pruefung_id` 
+			FROM  `testat` t
+			WHERE t.`pruefung_id` = c.`pruefung_id`
+			)
 			AND d.`student_id` =1
-		 * 
 		 * */
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
+		this.em = emf.createEntityManager();
 		
 		List<Number> nichtZugelassenePruefungen = new ArrayList<Number>();
 		
 		@SuppressWarnings("unchecked")
-		List<Object[]> result = em.createQuery(""
+		List<Object> result = em.createQuery(""
 				+ "SELECT d.id " + 
-				"FROM Angemeldetepruefung d " + 
-				"JOIN Aktuellepruefung c ON d.aktuellePruefung.id = c.id " + 
-				"JOIN Testat t ON t.exam.id = c.pruefung.id " + 
-				"WHERE (t.exam.id IS NULL AND d.teilnehmer.matrikelnummer = "+ id + ")").getResultList();
+				" FROM Angemeldetepruefung d " + 
+				" JOIN Aktuellepruefung c ON d.aktuellePruefung.id = c.id " + 
+				" WHERE  NOT EXISTS ( "
+				+ " SELECT t.exam.id "
+				+ " FROM Testat t "
+				+ " WHERE t.exam.id = c.pruefung.id )"
+				+ " AND d.teilnehmer.matrikelnummer = " + id).getResultList();
 
 		System.out.println("Nach dem Select");
-		
-		for(Object[] o : result) {
-			nichtZugelassenePruefungen.add((Number)o[0]);
-		}
+		em.getTransaction().begin();
+		for(Object o : result) {
+			nichtZugelassenePruefungen.add((Number) o);
+			//Updaten der Anmeldungen : Automatisches abmelden der Klausuren
 
-		
+			
+			Query query = em.createQuery("UPDATE Angemeldetepruefung a SET a.status = -1 "
+					+ "WHERE a.id= " + (Number) o);		
+			query.executeUpdate();
+			
+			
+		    
+		}
+		em.getTransaction().commit();
+		em.close();
+
 		return nichtZugelassenePruefungen;
 	}
 	
