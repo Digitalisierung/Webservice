@@ -23,6 +23,7 @@ public class AbmeldungDTO {
 	public void setStudent_id(Number student_id) {
 		this.student_id = student_id;
 	}
+	
 	public Number getAkt_id() {
 		return akt_id;
 	}
