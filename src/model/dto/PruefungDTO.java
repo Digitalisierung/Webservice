@@ -8,9 +8,12 @@ public class PruefungDTO {
 	private String datum;
 	private String Raum;
 	
+	public PruefungDTO() {
+		
+	}
 
 	public PruefungDTO(Number id, String name, String aufsicht, String datum, String raum) {
-		super();
+		///super();
 		this.id = id;
 		this.name = name;
 		this.aufsicht = aufsicht;

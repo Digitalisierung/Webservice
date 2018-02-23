@@ -5,54 +5,83 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import controller.broker.EntityAccessBroker;
-import model.dto.ApprovalPracticalExamDTO;
-import model.dto.IdDTO;
+import model.dto.CheckApprovalDTO;
+import model.dto.PruefungDTO;
 import model.dto.SubjectDTO;
+import model.entitys.Aktuellepruefung;
 
 @Path("practice")
 public class PracticeExamRegisterProcess {
 	EntityAccessBroker broker = new EntityAccessBroker();
 	
 	/*
-	 * Prozess: Zulassung prüfen
+	 * Task: Prüfungen holen
 	 * Beschreibung:
-	 * 			Eine Liste aller bestandenen Prüfungen die ein Student bestanden hat, wird zurueckgegeben
+	 * 			Eine Liste aller Prüfungen wird zurueckgegeben
 	 */
 	@GET
-	@Path("approval/{matrikel}")
+	@Path("subjects")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<SubjectDTO> checkApproval(@PathParam("matrikel") Integer matrikelnummer) {
-		return broker.getListOfSubjects(matrikelnummer);
+	public List<SubjectDTO> checkApproval() {
+		return broker.getListOfSubjects();
 	}
 	
 	
 	/*
-	 * Prozess: Praxisprojekt anmelden
+	 * Task: aktuelle P. setzen
 	 * Beschreibung:
 	 * 			
 	 */
 	@POST
-	@Path("register")
+	@Path("activate")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ApprovalPracticalExamDTO registerPracticalExam(IdDTO flag) {
+	public PruefungDTO setExamAktive(SubjectDTO subject) {
+		/*
+		 * man bekommt prof email und Prüfung id
+		 * 1. prof finden (email)
+		 * 2. prüfung finden
+		 * 3. AktuellePruefung setzen
+		 * 
+		 */
+		//ApprovalPracticalExamDTO o = broker.getApprovalThesisThemenByStudentID(flag.getId());
+		Aktuellepruefung ap = broker.saveAktuellePruefung(subject);
 		
-		ApprovalPracticalExamDTO o = broker.getApprovalThesisThemenByStudentID(flag.getId());
-		return o;
+		PruefungDTO exam = new PruefungDTO();
+		exam.setId(ap.getId());
+		exam.setName(ap.getPruefung().getName());
+		exam.setRaum(ap.getRaum());
+		exam.setDatum(ap.getDatum().toString());
+		exam.setAufsicht(ap.getAufsicht());
+		
+		return exam;
 		
 	}
 	
 	
-	@POST
-	@Path("grade")
+	
+	/*
+	 * TASK: Aktuelle P. holen
+	 */
+	@GET
+	@Path("exam")
 	@Produces(MediaType.APPLICATION_JSON)
-	public IdDTO setPracticalWorkMark(IdDTO mark) {
-		return mark;
+	public List<PruefungDTO> getAktiveExams() {
+		return broker.getAllAktuellePruefungs();
 
 	}
+	
+	
+	/*
+	 * TASK: Zulassung Prüfen
+	 */
+	@GET
+	public Boolean checkApproval(CheckApprovalDTO approval) {
+		return broker.checkApproval(approval);
+	}
+	
 
 }

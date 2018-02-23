@@ -56,7 +56,7 @@ public class ThesisChooseProcess {
 	@Path("list/{email}")
 	@Produces( MediaType.APPLICATION_JSON )
 	public List<AdvertisementDTO> getAdvertisementsOfProf(@PathParam("email") String email) {	
-		return broker.findAllActiveAdvertisementsOf(email);
+		return broker.findAllActiveAdvertisementsByProfessorEmail(email);
 		
 	}
 	
