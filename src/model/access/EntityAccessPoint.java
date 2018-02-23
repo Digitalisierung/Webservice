@@ -16,6 +16,7 @@ import model.entitys.Aktuellepruefung;
 import model.entitys.Angemeldetepruefung;
 import model.entitys.Aushang;
 import model.entitys.Professor;
+import model.entitys.Pruefungen;
 import model.entitys.Student;
 import model.entitys.VorgemerkteAushaenge;
 import model.exceptions.EntryNotFoundException;
@@ -139,22 +140,16 @@ public class EntityAccessPoint {
 	}
 
 	public List<SubjectDTO> getListOfSubjects(Integer matrikelnummer) {
-		List<SubjectDTO> ls = new ArrayList<SubjectDTO>();
-		Query query = em.createQuery(
-				"SELECT a.teilnehmer.matrikelnummer, g.note, g.versuch, a.status, b.datum, p.credits, p.name "
-						+ "FROM GeschriebenePruefungen g " + "JOIN Angemeldetepruefung a ON g.statedTest.id=a.id "
-						+ "JOIN Aktuellepruefung b ON a.aktuellePruefung.id=b.id "
-						+ "JOIN Pruefungen p ON b.pruefung.id=p.id " + "WHERE a.teilnehmer.matrikelnummer="
-						+ matrikelnummer);
-
+		List<SubjectDTO> result = new ArrayList<SubjectDTO>();
+		Query query = em.createQuery("SELECT p FROM Pruefungen p");
 		@SuppressWarnings("unchecked")
-		List<Object[]> result = query.getResultList();
-
-		for (Object[] o : result) {
-			ls.add(new SubjectDTO((Number) o[0], (Number) o[1], (Number) o[2], (Number) o[3], o[4].toString(),
-					(Number) o[5], (String) o[6]));
+		List<Pruefungen> ls = query.getResultList();
+		
+		for(Pruefungen p : ls) {
+			result.add(new SubjectDTO());
 		}
-		return ls;
+		
+		return result;
 	}
 
 	public Student getStudentBy(Integer matrikelnummer) throws EntryNotFoundException {

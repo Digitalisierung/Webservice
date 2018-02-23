@@ -8,9 +8,8 @@ public class SubjectDTO implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Number matrikelnumber;	
-	private Number mark; 
-	private Number attemt; 
+	private Number id;
+	private Number attemt; // Versuch
 	private Number state; 
 	private String date; 
 	private Number credits; 
@@ -20,9 +19,8 @@ public class SubjectDTO implements Serializable{
 		
 	}
 	
-	public SubjectDTO(Number matrikelnumber, Number mark, Number attemt, Number state, String date, Number credits, String name) {
-		this.matrikelnumber = matrikelnumber;
-		this.mark = mark;
+	public SubjectDTO(Number id, String name, Number credits, Number attemt, Number state, String date) {
+		this.id = id;
 		this.attemt = attemt;
 		this.state = state;
 		this.date = date;
@@ -31,20 +29,12 @@ public class SubjectDTO implements Serializable{
 		
 	}
 
-	public Number getMatrikelnumber() {
-		return matrikelnumber;
+	public Number getId() {
+		return id;
 	}
 
-	public void setMatrikelnumber(Number matrikelnumber) {
-		this.matrikelnumber = matrikelnumber;
-	}
-
-	public Number getMark() {
-		return mark;
-	}
-
-	public void setMark(Number mark) {
-		this.mark = mark;
+	public void setId(Number id) {
+		this.id = id;
 	}
 
 	public Number getAttemt() {
@@ -89,7 +79,7 @@ public class SubjectDTO implements Serializable{
 
 	@Override
 	public String toString() {
-		return "SubjectDTO [matrikelnumber=" + matrikelnumber + ", mark=" + mark + ", attemt=" + attemt + ", state="
+		return "SubjectDTO [ID=" + id + ", attemt=" + attemt + ", state="
 				+ state + ", date=" + date + ", credits=" + credits + ", name=" + name + "]";
 	}
 
