@@ -91,19 +91,6 @@ public class RegisterExam {
 		this.em = emf.createEntityManager();
 		em.getTransaction().begin();
 		
-		/*
-		 * INSERT  k39752uz_gpm_server1.angemeldetepruefung (student_id, akt_id) 
-			SELECT  1,1
-			WHERE   NOT EXISTS 
-        (   SELECT  *
-            FROM    k39752uz_gpm_server1.angemeldetepruefung 
-            WHERE   student_id = 1 
-            AND     akt_id = 1
-        )
-		 */
-		
-		//Kein Dot.Walkin -> enfach orginalen Namen nehmen!
-		
 		Query query = em.createNativeQuery("INSERT INTO Angemeldetepruefung (student_id , akt_id )"+ 
 				" SELECT " + an.getStudent_id() + ", " + an.getAkt_id() 
 				+ " WHERE NOT EXISTS ("
@@ -298,7 +285,7 @@ public class RegisterExam {
 		return std;
 	}
 	
-	@GET
+	    @GET
 		@Path("meineAnmeldungen/{martikelnr}")
 		@Produces(MediaType.APPLICATION_JSON)
 		public List<PruefungInfoDTO> getAnmeldungen(@PathParam("martikelnr") Integer martikelnr)
