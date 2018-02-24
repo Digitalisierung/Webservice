@@ -1,10 +1,16 @@
 package model.dto;
 
-public class IdDTO {
-private Integer id;
-	
+import java.io.Serializable;
+
+public class IdDTO implements Serializable {
+	/**
+		 * 
+		 */
+	private static final long serialVersionUID = 1L;
+	private Integer id;
+
 	public IdDTO() {
-		
+
 	}
 
 	public Integer getId() {

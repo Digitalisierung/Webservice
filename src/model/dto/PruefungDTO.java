@@ -1,18 +1,25 @@
 package model.dto;
 
-import java.util.Date;
+import java.io.Serializable;
 
-public class PruefungDTO {
+public class PruefungDTO implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Number id;
 	private String name;
 	private String aufsicht;
 	private String datum;
 	private String Raum;
 	
+	public PruefungDTO() {
+		
+	}
 
 	public PruefungDTO(Number id, String name, String aufsicht, String datum, String raum) {
-		super();
+		///super();
 		this.id = id;
 		this.name = name;
 		this.aufsicht = aufsicht;
