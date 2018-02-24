@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -20,7 +19,6 @@ import model.dto.AbmeldungDTO;
 import model.dto.AnmeldungDTO;
 import model.dto.AnmeldungenDTO;
 import model.dto.PruefungDTO;
-import model.dto.PruefungInfoDTO;
 import model.dto.StudentDTO;
 
 @Path("exams")
@@ -84,7 +82,6 @@ public class RegisterExam {
 	 */
 	@POST
 	@Path("anmelden")
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public int KlausurAnmelden(AnmeldungDTO an) {
 		System.out.println(an);
@@ -319,35 +316,5 @@ public class RegisterExam {
 		
 		return std;
 	}
-	
-	@GET
-	@Path("meineAnmeldungen/{martikelnr}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<PruefungInfoDTO> getAnmeldungen(@PathParam("martikelnr") Integer martikelnr)
-	{
-
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
-		this.em = emf.createEntityManager();
-		@SuppressWarnings("unchecked")
-		List<Object[]> results = em.createQuery(
-				 "SELECT p.name, p.semester , ak.datum , ak.prof.name ,a.status"
-				 + " FROM Angemeldetepruefung a"
-				 + " JOIN Student s ON a.teilnehmer.matrikelnummer = s.matrikelnummer"
-				 + " JOIN Aktuellepruefung ak ON a.aktuellePruefung.id = ak.id"
-				 + " JOIN Pruefungen p ON ak.pruefung.id = p.id"
-				 + " WHERE s.matrikelnummer = " + martikelnr
-			).getResultList();
-		
-		List<PruefungInfoDTO> std = new ArrayList<PruefungInfoDTO>();
-		
-		for(Object[] o : results) {
-			std.add(new PruefungInfoDTO((String) o[0],(Number) o[1], o[2].toString(),(String) o[3],(Number) o[4]));
-		}
-		
-		return std;
-	}
-	
-	
-	
 	
 }
