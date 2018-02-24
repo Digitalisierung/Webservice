@@ -1,5 +1,6 @@
 package rest.api;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +16,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import model.access.EntityAccessPoint;
 import model.dto.AbmeldungDTO;
 import model.dto.AnmeldungDTO;
 import model.dto.AnmeldungenDTO;
 import model.dto.PruefungDTO;
 import model.dto.PruefungInfoDTO;
 import model.dto.StudentDTO;
+import model.entitys.Aktuellepruefung;
+import model.entitys.Angemeldetepruefung;
+import model.entitys.Student;
+import model.exceptions.EntryNotFoundException;
 
 @Path("exams")
 public class RegisterExam {
@@ -80,6 +86,7 @@ public class RegisterExam {
 	 * status der Anmeldung Defaultmäßig auf 1 gesetzt wird
 	 * @param an - eine DTO in der student_id und akt_id übergeben werden
 	 * @return 1 um zu zeigen, dass es erfolgreich funktioniert hat
+	 * @throws EntryNotFoundException 
 	 */
 	
 	
@@ -88,25 +95,61 @@ public class RegisterExam {
 	@POST
 	@Path("anmelden")
 	@Produces(MediaType.APPLICATION_JSON)
-	public int KlausurAnmelden(AnmeldungDTO an) {
+	public int KlausurAnmelden(AnmeldungDTO an) throws EntryNotFoundException {
 		System.out.println(an);
 		
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 		this.em = emf.createEntityManager();
-		em.getTransaction().begin();
+		//
 		
-		Query query = em.createQuery("INSERT INTO Angemeldetepruefung (student_id , akt_id )"+ 
+		/*Query query = em.createQuery("INSERT INTO Angemeldetepruefung (student_id , akt_id )"+ 
 				" SELECT " + an.getStudent_id() + ", " + an.getAkt_id() 
 				+ " WHERE NOT EXISTS ("
 				+ " SELECT * FROM Angemeldetepruefung "
 				+ " WHERE student_id = "+ an.getStudent_id()
 				+ " AND akt_id = " + an.getAkt_id() +")");
-        query.executeUpdate();
-        em.getTransaction().commit();
+		*/
+		
+		Query query = em.createQuery( 
+				    "SELECT a.teilnehmer.matrikelnummer FROM Angemeldetepruefung a "
+				  + " WHERE a.teilnehmer.matrikelnummer = " +an.getStudent_id()
+				  + " AND a.aktuellePruefung.id = " + an.getAkt_id()
+				);
+		
+		List<Object[]> result =  query.getResultList();
+		
+
+		if(result != null) {
+			EntityAccessPoint ep = new EntityAccessPoint(em);
+			
+			Student s = ep.getStudentByID( an.getStudent_id().intValue());
+			Aktuellepruefung a = ep.getAktuellePruefungByID(an.getAkt_id().intValue());
+			
+			em.getTransaction().begin();
+			Angemeldetepruefung ap = new Angemeldetepruefung();
+			
+			ap.setTeilnehmer(s);
+			ap.setAktuellePruefung(a);
+			ap.setStatus(1);
+			
+			em.persist(ap);
+			em.flush();
+			em.getTransaction().commit();
+			em.close();
+			
+			
+			return 1;
+		}
+		
+		
+		
+		
+        //query.executeUpdate();
+        //em.getTransaction().commit();
         
-        em.close();
+        //em.close();
         
-        return 1;
+        return -1;
 	}
 	
 	
