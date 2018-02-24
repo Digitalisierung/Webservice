@@ -19,6 +19,7 @@ import model.dto.AbmeldungDTO;
 import model.dto.AnmeldungDTO;
 import model.dto.AnmeldungenDTO;
 import model.dto.PruefungDTO;
+import model.dto.PruefungInfoDTO;
 import model.dto.StudentDTO;
 
 @Path("exams")
@@ -154,18 +155,7 @@ public class RegisterExam {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Number> checkTestat(@PathParam("id") Integer id) {
 		
-		/* 
-		 *  SELECT d.`id` 
-			FROM  `angemeldetepruefung` d
-			JOIN  `aktuellepruefung` c ON d.`akt_id` = c.`id` 
-			WHERE NOT 
-			EXISTS (
-			SELECT t.`pruefung_id` 
-			FROM  `testat` t
-			WHERE t.`pruefung_id` = c.`pruefung_id`
-			)
-			AND d.`student_id` =1
-		 * */
+	
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 		this.em = emf.createEntityManager();
 		
@@ -215,16 +205,7 @@ public class RegisterExam {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<AnmeldungenDTO> showAnmeldungen(@PathParam("prof_id") Integer prof_id,@PathParam("akt_id") Integer akt_id){
 		List<AnmeldungenDTO> anmeldungen = new ArrayList<AnmeldungenDTO>();
-		/*
-		 * 
-		 *  SELECT c.`matrikelnummer` , c.`vorname`, c.`name`  
-			FROM  `angemeldetepruefung` a
-			JOIN  `aktuellepruefung` b ON a.`akt_id` = b.`id` 
-			JOIN  `student` c ON a.`student_id` = c.`matrikelnummer` 
-			WHERE b.`prof_id` =2
-			AND b.`id` =1
-		 * 
-		 * */
+	
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 		this.em = emf.createEntityManager();
 		
@@ -316,5 +297,32 @@ public class RegisterExam {
 		
 		return std;
 	}
+	
+	@GET
+		@Path("meineAnmeldungen/{martikelnr}")
+		@Produces(MediaType.APPLICATION_JSON)
+		public List<PruefungInfoDTO> getAnmeldungen(@PathParam("martikelnr") Integer martikelnr)
+		{
+	
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
+			this.em = emf.createEntityManager();
+			@SuppressWarnings("unchecked")
+			List<Object[]> results = em.createQuery(
+					 "SELECT p.name, p.semester , ak.datum , ak.prof.name ,a.status"
+					 + " FROM Angemeldetepruefung a"
+					 + " JOIN Student s ON a.teilnehmer.matrikelnummer = s.matrikelnummer"
+					 + " JOIN Aktuellepruefung ak ON a.aktuellePruefung.id = ak.id"
+					 + " JOIN Pruefungen p ON ak.pruefung.id = p.id"
+					 + " WHERE s.matrikelnummer = " + martikelnr
+				).getResultList();
+			
+			List<PruefungInfoDTO> std = new ArrayList<PruefungInfoDTO>();
+			
+			for(Object[] o : results) {
+				std.add(new PruefungInfoDTO((String) o[0],(Number) o[1], o[2].toString(),(String) o[3],(Number) o[4]));
+			}
+			
+			return std;
+		}
 	
 }
