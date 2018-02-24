@@ -31,7 +31,7 @@ public class RegisterExam {
  * Durch die GET-Methode werden bei der DB alle aktuellen Klausuren
  * mit einer SELECT-Query abgefragt
  * @param -
- * @return Die Liste aller aktuellen Prüfungen
+ * @return Die Liste aller aktuellen Prï¿½fungen
  */
 	@GET
 	@Path("getAll")
@@ -49,7 +49,7 @@ public class RegisterExam {
 				+ "FROM Pruefungen p "
 				+ "JOIN Aktuellepruefung b ON p.id=b.pruefung.id").getResultList();
 		
-		System.out.println("Nach dem Select");
+		//System.out.println("Nach dem Select");
 
 		for(Object[] o : result) {
 			ls.add(new PruefungDTO((Number)o[0], (String)o[1], (String)o[2], o[3].toString(), (String)o[4]));
@@ -77,8 +77,8 @@ public class RegisterExam {
 	/**
 	 * Es wird ein Eintrag in der Tabelle "angemeldetepruefung" gesetzt 
 	 * in dem die studenten_id und die akt_id genutzt werden und der 
-	 * status der Anmeldung Defaultmäßig auf 1 gesetzt wird
-	 * @param an - eine DTO in der student_id und akt_id übergeben werden
+	 * status der Anmeldung Defaultmï¿½ï¿½ig auf 1 gesetzt wird
+	 * @param an - eine DTO in der student_id und akt_id ï¿½bergeben werden
 	 * @return 1 um zu zeigen, dass es erfolgreich funktioniert hat
 	 */
 	@POST
@@ -119,10 +119,10 @@ public class RegisterExam {
 	
 	
 	/**
-	 * Ein Eintrag der abhängig von der student_id und der akt_id 
+	 * Ein Eintrag der abhï¿½ngig von der student_id und der akt_id 
 	 * den status des Datensatzes auf 0 setzt
-	 * @param ab - eine DTO in der student_id und akt_id übergeben werden
-	 * @return das geschickte Object wird wider returned - mit mos worten "falls nötig"
+	 * @param ab - eine DTO in der student_id und akt_id ï¿½bergeben werden
+	 * @return das geschickte Object wird wider returned - mit mos worten "falls nï¿½tig"
 	 */
 	@PUT
 	@Path("abmelden")
@@ -145,10 +145,10 @@ public class RegisterExam {
 	
 	/**
 	 * Die Anmeldeliste wird mit der Testat Liste verglichen
-	 * alle Prüfungen für die der Student kein Testat besitzt werden auf -1 gesetzt
+	 * alle Prï¿½fungen fï¿½r die der Student kein Testat besitzt werden auf -1 gesetzt
 	 * @param id - Die student_id der DB
-	 * @return eine Liste der Angemeldeten Prüfungen 
-	 * für die der Student kein Testat besitzt
+	 * @return eine Liste der Angemeldeten Prï¿½fungen 
+	 * fï¿½r die der Student kein Testat besitzt
 	 */
 	@GET
 	@Path("checktestate/{id}")
@@ -196,8 +196,8 @@ public class RegisterExam {
 	/**
 	 * Anhand der IDs kann der Professor gezielt die Anmeldeliste der 
 	 * jeweiligen Klausur erhalten
-	 * @param prof_id Die ProfessorID für den Namen des Professors
-	 * @param akt_id Die aktuelle PrüfungsID für die Liste
+	 * @param prof_id Die ProfessorID fï¿½r den Namen des Professors
+	 * @param akt_id Die aktuelle Prï¿½fungsID fï¿½r die Liste
 	 * @return Liste der Teilnehmer als DTO
 	 */
 	@GET
@@ -228,11 +228,11 @@ public class RegisterExam {
 	
 	
 	/**
-	 * genutzt für eine Dynamisch aufgebaute Email die nach 
+	 * genutzt fï¿½r eine Dynamisch aufgebaute Email die nach 
 	 * jeder Anmeldung verschickt wird
-	 * @param martikelnr des Studenten für die Infos der Email
-	 * @param akt_id der AktuellenPrüfung für den Namen der Prüfung
-	 * @return ein DTO mit dem man (Vor-)Namen, Prüfungsnamen und Email bekommt
+	 * @param martikelnr des Studenten fï¿½r die Infos der Email
+	 * @param akt_id der AktuellenPrï¿½fung fï¿½r den Namen der Prï¿½fung
+	 * @return ein DTO mit dem man (Vor-)Namen, Prï¿½fungsnamen und Email bekommt
 	 */
 	@GET
 	@Path("email/{martikelnr}/{akt_id}")
@@ -266,9 +266,9 @@ public class RegisterExam {
 	
 	
 	/**
-	 * Endgültige Besätigung aller Zugelassenen und angemeldeten Prüfungen
+	 * Endgï¿½ltige Besï¿½tigung aller Zugelassenen und angemeldeten Prï¿½fungen
 	 * @param martikelnr der Studenten
-	 * @return eine Liste mit (Vor-)Namen, Prüfungsnamen und Email
+	 * @return eine Liste mit (Vor-)Namen, Prï¿½fungsnamen und Email
 	 */
 	@GET
 	@Path("angemeldete/{martikelnr}")
