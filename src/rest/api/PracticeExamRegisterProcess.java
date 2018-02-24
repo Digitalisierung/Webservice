@@ -65,8 +65,6 @@ public class PracticeExamRegisterProcess {
 		
 	}
 	
-	
-	
 	/*
 	 * TASK: Aktuelle P. holen
 	 */
