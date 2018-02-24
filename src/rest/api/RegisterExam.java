@@ -119,7 +119,7 @@ public class RegisterExam {
 		List<Object[]> result =  query.getResultList();
 		
 
-		if(result != null) {
+		if(result.isEmpty()) {
 			EntityAccessPoint ep = new EntityAccessPoint(em);
 			
 			Student s = ep.getStudentByID( an.getStudent_id().intValue());
@@ -141,14 +141,7 @@ public class RegisterExam {
 			return 1;
 		}
 		
-		
-		
-		
-        //query.executeUpdate();
-        //em.getTransaction().commit();
-        
-        //em.close();
-        
+
         return -1;
 	}
 	
