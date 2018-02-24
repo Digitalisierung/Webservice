@@ -95,7 +95,7 @@ public class RegisterExam {
 		this.em = emf.createEntityManager();
 		em.getTransaction().begin();
 		
-		Query query = em.createNativeQuery("INSERT INTO Angemeldetepruefung (student_id , akt_id )"+ 
+		Query query = em.createQuery("INSERT INTO Angemeldetepruefung (student_id , akt_id )"+ 
 				" SELECT " + an.getStudent_id() + ", " + an.getAkt_id() 
 				+ " WHERE NOT EXISTS ("
 				+ " SELECT * FROM Angemeldetepruefung "
@@ -103,6 +103,7 @@ public class RegisterExam {
 				+ " AND akt_id = " + an.getAkt_id() +")");
         query.executeUpdate();
         em.getTransaction().commit();
+        
         em.close();
         
         return 1;
@@ -315,5 +316,7 @@ public class RegisterExam {
 			
 			return std;
 		}
+	    
+
 	
 }
