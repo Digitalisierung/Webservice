@@ -48,7 +48,7 @@ public class RegisterExam {
 		this.em = emf.createEntityManager();
 		
 		List<PruefungDTO> ls = new ArrayList<PruefungDTO>();
-		System.out.println("Vor dem Select");
+		//System.out.println("Vor dem Select");
 		
 		@SuppressWarnings("unchecked")
 		List<Object[]> result = em.createQuery("SELECT b.id, p.name, b.aufsicht, b.datum, b.raum "
@@ -96,7 +96,7 @@ public class RegisterExam {
 	@Path("anmelden")
 	@Produces(MediaType.APPLICATION_JSON)
 	public int KlausurAnmelden(AnmeldungDTO an) throws EntryNotFoundException {
-		System.out.println(an);
+		//System.out.println(an);
 		
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 		this.em = emf.createEntityManager();
@@ -200,7 +200,7 @@ public class RegisterExam {
 				+ " WHERE t.exam.id = c.pruefung.id )"
 				+ " AND d.teilnehmer.matrikelnummer = " + id).getResultList();
 
-		System.out.println("Nach dem Select");
+		//System.out.println("Nach dem Select");
 		em.getTransaction().begin();
 		for(Object o : result) {
 			nichtZugelassenePruefungen.add((Number) o);
@@ -281,7 +281,7 @@ public class RegisterExam {
 				 + " AND ak.id = " + akt_id
 			).getResultList();
 
-		System.out.println("Nach dem Select");
+		//System.out.println("Nach dem Select");
 		
 		StudentDTO std = null;
 		
@@ -352,7 +352,5 @@ public class RegisterExam {
 			
 			return std;
 		}
-	    
-
 	
 }
