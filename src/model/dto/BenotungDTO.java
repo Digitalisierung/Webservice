@@ -14,11 +14,6 @@ public class BenotungDTO implements Serializable{
 	public BenotungDTO() {
 		
 	}
-	
-	public BenotungDTO(Number matrikelnummer, Number grade) {
-		this.matrikelnummer = matrikelnummer;
-		this.grade = grade;
-	}
 
 	public Number getMatrikelnummer() {
 		return matrikelnummer;
