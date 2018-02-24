@@ -12,6 +12,10 @@ public class IdDTO implements Serializable {
 	public IdDTO() {
 
 	}
+	
+	public IdDTO(Integer id) {
+		this.id = id;
+	}
 
 	public Integer getId() {
 		return id;
