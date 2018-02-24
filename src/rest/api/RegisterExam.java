@@ -81,6 +81,10 @@ public class RegisterExam {
 	 * @param an - eine DTO in der student_id und akt_id übergeben werden
 	 * @return 1 um zu zeigen, dass es erfolgreich funktioniert hat
 	 */
+	
+	
+	//Hallo Juri 24.02.18 21:15
+	
 	@POST
 	@Path("anmelden")
 	@Produces(MediaType.APPLICATION_JSON)
