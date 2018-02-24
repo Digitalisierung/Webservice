@@ -2,15 +2,15 @@ package model.dto;
 
 import java.io.Serializable;
 
-public class IdDTO implements Serializable{
-/**
-	 * 
-	 */
+public class IdDTO implements Serializable {
+	/**
+		 * 
+		 */
 	private static final long serialVersionUID = 1L;
-private Integer id;
-	
+	private Integer id;
+
 	public IdDTO() {
-		
+
 	}
 
 	public Integer getId() {

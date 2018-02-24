@@ -11,7 +11,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import controller.exception.SaveFailedException;
-import model.dto.CheckApprovalDTO;
+import model.dto.BenotungDTO;
 import model.dto.SubjectDTO;
 import model.entitys.Aktuellepruefung;
 import model.entitys.Angemeldetepruefung;
@@ -212,6 +212,24 @@ public class EntityAccessPoint {
 		return exams;
 	}
 
+	public Integer getCreditsSumByStudentID(Integer matrikelnummer) {
+		Query query = em.createQuery("SELECT SUM(p.credits) "
+				+ "FROM GeschriebenePruefungen g "
+				+ "JOIN Angemeldetepruefung a ON a.geschriebenePruefungen.id=g.id "
+				+ "JOIN Aktuellepruefung ap ON ap.id=a.aktuellePruefung.id "
+				+ "JOIN Pruefungen p ON p.id=ap.pruefung.id "
+				+ "WHERE (a.teilnehmer.matrikelnummer=" + matrikelnummer + ") AND (g.note<=4.0)");
+		
+		Long result = (Long)query.getSingleResult();
+		
+		if(result == null) {
+			result = new Long(0);
+		}
+		
+		return (Integer)result.intValue();
+		
+	}
+
 	public Integer setAushangEntryInaktiv(Integer id) {
 		Integer count = 0;
 		Query query = em.createQuery("UPDATE Aushang a SET a.aktiv=false WHERE a.id=" + id);
@@ -284,6 +302,32 @@ public class EntityAccessPoint {
 		return id;
 
 	}
+	
+	
+	public Integer saveStudentAssessment(BenotungDTO benotung) {
+		Integer id = 0;
+		Query query = em.createQuery("SELECT a FROM Angemeldetepruefung a WHERE a.teilnehmer.matrikelnummer=" + benotung.getMatrikelnummer());
+		@SuppressWarnings("unchecked")
+		List<Angemeldetepruefung> ls = query.getResultList();
+		
+		for(Angemeldetepruefung a : ls) {
+			if(a.getAktuellePruefung().getPruefung().getId() == 22) {
+				GeschriebenePruefungen gp = new GeschriebenePruefungen();
+				gp.setNote(benotung.getGrade().doubleValue());
+				gp.setStatedTest(a);
+				gp.setVersuch(1);
+				
+				em.getTransaction().begin();
+				em.persist(gp);
+				em.flush();
+				id = gp.getId();
+				em.getTransaction().commit();
+			}
+			
+		}
+		
+		return id;
+	}
 
 	public Aushang findAushang(Integer id) throws EntryNotFoundException {
 		Aushang a = em.find(Aushang.class, id);
@@ -318,21 +362,6 @@ public class EntityAccessPoint {
 
 		return flag;
 
-	}
-	
-	
-	public Integer gutCreditsSumByStudentID(Integer matrikelnummer) {
-		Query query = em.createQuery("SELECT SUM(p.credits) "
-				+ "FROM GeschriebenePruefungen g "
-				+ "JOIN Angemeldetepruefung a ON a.geschriebenePruefungen.id=g.id "
-				+ "JOIN Aktuellepruefung ap ON ap.id=a.aktuellePruefung.id "
-				+ "JOIN Pruefungen p ON p.id=ap.pruefung.id "
-				+ "WHERE (a.teilnehmer.matrikelnummer=" + matrikelnummer + ") AND (g.note<=4.0)");
-		
-		Integer result = (Integer)query.getSingleResult();
-		
-		return result;
-		
 	}
 	
 	

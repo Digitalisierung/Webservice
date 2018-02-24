@@ -1,7 +1,13 @@
 package model.dto;
 
-public class PruefungDTO {
+import java.io.Serializable;
+
+public class PruefungDTO implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Number id;
 	private String name;
 	private String aufsicht;

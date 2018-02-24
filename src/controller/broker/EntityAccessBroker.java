@@ -12,6 +12,7 @@ import javax.persistence.Persistence;
 import controller.exception.SaveFailedException;
 import model.access.EntityAccessPoint;
 import model.dto.AdvertisementDTO;
+import model.dto.BenotungDTO;
 import model.dto.CheckApprovalDTO;
 import model.dto.IdDTO;
 import model.dto.PruefungDTO;
@@ -96,6 +97,28 @@ public class EntityAccessBroker {
 
 	}
 
+	public Aktuellepruefung saveAktuellePruefung(SubjectDTO subject) {
+		Professor prof = eap.getProfessorByEmail(subject.getProf_email());
+		Pruefungen exams = eap.getPruefungenByID((Integer)subject.getSubjectID().intValue());
+		
+		Aktuellepruefung ap = new Aktuellepruefung();
+		
+		ap.setAufsicht("" + prof.getVorname() + " " +prof.getName());
+		ap.setDatum(new Date());
+		ap.setProf(prof);
+		ap.setPruefung(exams);
+		ap.setRaum("");
+		ap.setAngemeldetePruefunge(new HashSet<Angemeldetepruefung>());
+		
+		return eap.saveAktuellepruefung(ap);
+		
+	}
+	
+	
+	public Integer saveStudentAssessment(BenotungDTO benotung) {
+		return eap.saveStudentAssessment(benotung);
+	}
+
 	public List<AdvertisementDTO> findAllActiveAdvertisementsByProfessorEmail(String emal) {
 
 		Professor prof = eap.getProfessorByEmail(emal);
@@ -121,6 +144,30 @@ public class EntityAccessBroker {
 
 		return advs;
 
+	}
+
+	// PRAXISPROJEKT ANMELDEN # Für Prüfungen hollen Task #
+	public List<SubjectDTO> getListOfSubjects() {
+		return eap.getListOfSubjects();
+	}
+
+	public List<PruefungDTO> getAllAktuellePruefungs() {
+		List<Aktuellepruefung> exams = eap.getAllAktuellePruefungs();
+		
+		List<PruefungDTO> result = new ArrayList<PruefungDTO>();
+		
+		for(Aktuellepruefung exam : exams) {
+			result.add(new PruefungDTO(
+					exam.getId(), 
+					exam.getPruefung().getName(), 
+					(exam.getProf().getTitel() + " " + exam.getProf().getVorname() + " " + exam.getProf().getName()), 
+					exam.getDatum().toString(), 
+					exam.getRaum()
+					)
+					);
+		}
+		
+		return result;
 	}
 
 	public AdvertisementDTO update(AdvertisementDTO announce) throws Exception {
@@ -183,80 +230,40 @@ public class EntityAccessBroker {
 	}
 
 	
-	// PRAXISPROJEKT ANMELDEN # Für Prüfungen hollen Task #
-	public List<SubjectDTO> getListOfSubjects() {
-		return eap.getListOfSubjects();
-	}
-	
-	public List<PruefungDTO> getAllAktuellePruefungs() {
-		List<Aktuellepruefung> exams = eap.getAllAktuellePruefungs();
-		
-		List<PruefungDTO> result = new ArrayList<PruefungDTO>();
-		
-		for(Aktuellepruefung exam : exams) {
-			result.add(new PruefungDTO(
-					exam.getId(), 
-					exam.getPruefung().getName(), 
-					(exam.getProf().getTitel() + " " + exam.getProf().getVorname() + " " + exam.getProf().getName()), 
-					exam.getDatum().toString(), 
-					exam.getRaum()
-					)
-					);
-		}
-		
-		return result;
-	}
-	
-	public Aktuellepruefung saveAktuellePruefung(SubjectDTO subject) {
-		Professor prof = eap.getProfessorByEmail(subject.getProf_email());
-		Pruefungen exams = eap.getPruefungenByID((Integer)subject.getSubjectID().intValue());
-		
-		Aktuellepruefung ap = new Aktuellepruefung();
-		
-		ap.setAufsicht("" + prof.getVorname() + " " +prof.getName());
-		ap.setDatum(new Date());
-		ap.setProf(prof);
-		ap.setPruefung(exams);
-		ap.setRaum("");
-		ap.setAngemeldetePruefunge(new HashSet<Angemeldetepruefung>());
-		
-		return eap.saveAktuellepruefung(ap);
-		
-	}
-	
-	
-	public Boolean checkApproval(CheckApprovalDTO approval) {
+	public Integer registerPracticalExam(CheckApprovalDTO approval) {
 		Integer id = 0;
-		Integer credits = eap.gutCreditsSumByStudentID((Integer)approval.getMatrikelnummer().intValue());
+		Student student = null;
+		Aktuellepruefung akt_p = null;
+		
+		try {
+			student = eap.getStudentByID((Integer)approval.getMatrikelnummer().intValue());
+			akt_p = eap.getAktuellePruefungByID((Integer)approval.getExamID().intValue());
+		} catch (EntryNotFoundException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+		}
+
+		Angemeldetepruefung ap = new Angemeldetepruefung();
+		
+		ap.setAktuellePruefung(akt_p);
+		ap.setGeschriebenePruefungen(new HashSet<GeschriebenePruefungen>());
+		ap.setStatus(1);
+		ap.setTeilnehmer(student);
+		
+		id = eap.registerPracticeExam(ap);
+		
+		return id;
+	}
+	
+	
+	public Boolean checkApproval(Integer matrikelnummer) {
+		Integer credits = eap.getCreditsSumByStudentID(matrikelnummer);
 		
 		if(credits >= 120) {
-			Student student = null;
-			Aktuellepruefung akt_p = null;
-			
-			try {
-				student = eap.getStudentByID((Integer)approval.getMatrikelnummer().intValue());
-				akt_p = eap.getAktuellePruefungByID((Integer)approval.getExamID().intValue());
-			} catch (EntryNotFoundException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-			}
-
-			Angemeldetepruefung ap = new Angemeldetepruefung();
-			
-			ap.setAktuellePruefung(akt_p);
-			ap.setGeschriebenePruefungen(new HashSet<GeschriebenePruefungen>());
-			ap.setStatus(1);
-			ap.setTeilnehmer(student);
-			
-			id = eap.registerPracticeExam(ap);
-			
+			return true;
 		}
 		
-		if(id > 0) {
-			return new Boolean(true);
-		}else {
-			return new Boolean(false);
-		}
+		return false;
 	}
 
 }

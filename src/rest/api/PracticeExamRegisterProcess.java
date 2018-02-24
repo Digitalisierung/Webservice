@@ -5,11 +5,15 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import controller.broker.EntityAccessBroker;
+import model.dto.ApprovalDTO;
+import model.dto.BenotungDTO;
 import model.dto.CheckApprovalDTO;
+import model.dto.IdDTO;
 import model.dto.PruefungDTO;
 import model.dto.SubjectDTO;
 import model.entitys.Aktuellepruefung;
@@ -79,9 +83,33 @@ public class PracticeExamRegisterProcess {
 	 * TASK: Zulassung Prüfen
 	 */
 	@GET
-	public Boolean checkApproval(CheckApprovalDTO approval) {
-		return broker.checkApproval(approval);
+	@Path("approval/{matrikelnummer}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ApprovalDTO checkApproval(@PathParam("matrikelnummer") Integer matrikelnummer) {
+		ApprovalDTO result = new ApprovalDTO();
+		result.setApproval(broker.checkApproval(matrikelnummer));
+		return result;
 	}
 	
+	
+	@POST
+	@Path("register")
+	@Produces(MediaType.APPLICATION_JSON)
+	public IdDTO registerPracticalExam(CheckApprovalDTO approval) {
+		IdDTO Id = new IdDTO();
+		Integer id = broker.registerPracticalExam(approval);
+		Id.setId(id);
+		
+		return Id;
+	}
+	
+	
+	@POST
+	@Path("grade")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Integer setGradeForPracticeExam(BenotungDTO benotung) {
+		return broker.saveStudentAssessment(benotung);
+		
+	}
 
 }
