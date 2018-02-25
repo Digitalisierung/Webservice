@@ -1,6 +1,5 @@
 package rest.api;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import model.dto.AnmeldungenDTO;
 import model.dto.PruefungDTO;
 import model.dto.PruefungInfoDTO;
 import model.dto.StudentDTO;
+import model.dto.TestatCheckDTO;
 import model.entitys.Aktuellepruefung;
 import model.entitys.Angemeldetepruefung;
 import model.entitys.Student;
@@ -184,45 +184,51 @@ public class RegisterExam {
 	 * f�r die der Student kein Testat besitzt
 	 */
 	@GET
-	@Path("checktestate/{id}")
+	@Path("checktestate/{akt_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Number> checkTestat(@PathParam("id") Integer id) {
+	public List<TestatCheckDTO> checkTestat(@PathParam("akt_id") Integer akt_id) {
 		
-	
+		
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 		this.em = emf.createEntityManager();
 		
-		List<Number> nichtZugelassenePruefungen = new ArrayList<Number>();
+		
+		List<TestatCheckDTO> ls = new ArrayList<TestatCheckDTO>();
+
 		
 		@SuppressWarnings("unchecked")
-		List<Object> result = em.createQuery(""
-				+ "SELECT d.id " + 
+		List<Object[]> result = em.createQuery(""
+				+ "SELECT d.id , s.matrikelnummer, s.name, s.vorname, s.email , c.id , p.name, d.status" + 
 				" FROM Angemeldetepruefung d " + 
-				" JOIN Aktuellepruefung c ON d.aktuellePruefung.id = c.id " + 
-				" WHERE  NOT EXISTS ( "
+				" JOIN Aktuellepruefung c ON d.aktuellePruefung.id = c.id "
+				+ "JOIN Student s ON d.teilnehmer.matrikelnummer = s.matrikelnummer "
+				+ " JOIN Pruefungen p ON c.pruefung.id = p.id" 
+				+ " WHERE  NOT EXISTS ( "
 				+ " SELECT t.exam.id "
 				+ " FROM Testat t "
-				+ " WHERE t.exam.id = c.pruefung.id )"
-				+ " AND d.teilnehmer.matrikelnummer = " + id).getResultList();
-
+				+ " WHERE t.exam.id = c.pruefung.id "
+				+ " AND t.studierender.matrikelnummer = s.matrikelnummer)"
+				+ " AND d.status = 1"
+				+ " AND c.id = "+ akt_id
+					).getResultList();
+		
+		
+		
 		//System.out.println("Nach dem Select");
 		em.getTransaction().begin();
-		for(Object o : result) {
-			nichtZugelassenePruefungen.add((Number) o);
+		for(Object[] o : result) {
+			ls.add(new TestatCheckDTO( (Number)o[0], (Number)o[1], (String)o[2],(String)o[3], (String)o[4] ,(Number)o[5], (String)o[6], (Number)o[7] ) );
 			//Updaten der Anmeldungen : Automatisches abmelden der Klausuren
-
 			
 			Query query = em.createQuery("UPDATE Angemeldetepruefung a SET a.status = -1 "
-					+ "WHERE a.id= " + (Number) o);		
+					+ "WHERE a.id= " + (Number) o[0]);		
 			query.executeUpdate();
-			
-			
 		    
 		}
 		em.getTransaction().commit();
 		em.close();
 
-		return nichtZugelassenePruefungen;
+		return ls;
 	}
 	
 	
