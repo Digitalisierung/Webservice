@@ -40,20 +40,27 @@ public class RegisterExam {
  * @return Die Liste aller aktuellen Prüfungen
  */
 	@GET
-	@Path("getAll")
+	@Path("getAll/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<PruefungDTO> get(){
+	public List<PruefungDTO> get(@PathParam("id") Integer id){
 		
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 		this.em = emf.createEntityManager();
 		
 		List<PruefungDTO> ls = new ArrayList<PruefungDTO>();
 		System.out.println("Vor dem Select");
-		
+
+
 		@SuppressWarnings("unchecked")
-		List<Object[]> result = em.createQuery("SELECT b.id, p.name, b.aufsicht, b.datum, b.raum "
-				+ "FROM Pruefungen p "
-				+ "JOIN Aktuellepruefung b ON p.id=b.pruefung.id").getResultList();
+		List<Object[]> result = em.createQuery("SELECT b.id, p.name, b.aufsicht, b.datum, b.raum"
+				+ " FROM Pruefungen p"
+				+ " JOIN Aktuellepruefung b ON p.id = b.pruefung.id"
+				+ " WHERE NOT EXISTS ("
+				+ " SELECT a.id"
+				+ " FROM Angemeldetepruefung a"
+				+ " JOIN Student s ON a.teilnehmer.matrikelnummer = s.matrikelnummer"
+				+ " WHERE b.id = a.aktuellePruefung.id "
+				+ " AND s.matrikelnummer ="+id + " )").getResultList();
 		
 		System.out.println("Nach dem Select");
 
@@ -301,14 +308,14 @@ public class RegisterExam {
 	@GET
 	@Path("angemeldete/{martikelnr}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<StudentDTO> getInfo(@PathParam("martikelnr") Integer martikelnr)
+	public List<StudentDTO> getAnmeldungen(@PathParam("martikelnr") Integer martikelnr)
 	{
 
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 		this.em = emf.createEntityManager();
 		@SuppressWarnings("unchecked")
 		List<Object[]> results = em.createQuery(
-				 "SELECT s.name, s.vorname, p.name , s.email "
+				 "SELECT  s.name, s.vorname, p.name , s.email "
 				 + " FROM Angemeldetepruefung a"
 				 + " JOIN Student s ON a.teilnehmer.matrikelnummer = s.matrikelnummer"
 				 + " JOIN Aktuellepruefung ak ON a.aktuellePruefung.id = ak.id"
@@ -326,17 +333,47 @@ public class RegisterExam {
 		return std;
 	}
 	
+	
+	@GET
+	@Path("abgemeldete/{martikelnr}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<StudentDTO> getAbmeldungen(@PathParam("martikelnr") Integer martikelnr)
+	{
+
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
+		this.em = emf.createEntityManager();
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = em.createQuery(
+				 "SELECT  s.name, s.vorname, p.name , s.email "
+				 + " FROM Angemeldetepruefung a"
+				 + " JOIN Student s ON a.teilnehmer.matrikelnummer = s.matrikelnummer"
+				 + " JOIN Aktuellepruefung ak ON a.aktuellePruefung.id = ak.id"
+				 + " JOIN Pruefungen p ON ak.pruefung.id = p.id"
+				 + " WHERE s.matrikelnummer = " + martikelnr
+				 + " AND a.status = 0"
+			).getResultList();
+		
+		List<StudentDTO> std = new ArrayList<StudentDTO>();
+		
+		for(Object[] o : results) {
+			std.add(new StudentDTO((String) o[0],(String) o[1],(String) o[2],(String) o[3]));
+		}
+		
+		return std;
+	}
+	
+	
 	    @GET
 		@Path("meineAnmeldungen/{martikelnr}")
 		@Produces(MediaType.APPLICATION_JSON)
-		public List<PruefungInfoDTO> getAnmeldungen(@PathParam("martikelnr") Integer martikelnr)
+		public List<PruefungInfoDTO> getMeineAnmeldungen(@PathParam("martikelnr") Integer martikelnr)
 		{
 	
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
 			this.em = emf.createEntityManager();
 			@SuppressWarnings("unchecked")
 			List<Object[]> results = em.createQuery(
-					 "SELECT p.name, p.semester , ak.datum , ak.prof.name ,a.status"
+					 "SELECT ak.id ,p.name, p.semester , ak.datum , ak.prof.name ,a.status"
 					 + " FROM Angemeldetepruefung a"
 					 + " JOIN Student s ON a.teilnehmer.matrikelnummer = s.matrikelnummer"
 					 + " JOIN Aktuellepruefung ak ON a.aktuellePruefung.id = ak.id"
@@ -347,11 +384,13 @@ public class RegisterExam {
 			List<PruefungInfoDTO> std = new ArrayList<PruefungInfoDTO>();
 			
 			for(Object[] o : results) {
-				std.add(new PruefungInfoDTO((String) o[0],(Number) o[1], o[2].toString(),(String) o[3],(Number) o[4]));
+				std.add(new PruefungInfoDTO((Number) o[0],(String) o[1],(Number) o[2], o[3].toString(),(String) o[4],(Number) o[5]));
 			}
 			
 			return std;
 		}
+	    
+	    
 	    
 
 	
