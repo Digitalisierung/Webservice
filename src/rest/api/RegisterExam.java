@@ -19,12 +19,14 @@ import model.access.EntityAccessPoint;
 import model.dto.AbmeldungDTO;
 import model.dto.AnmeldungDTO;
 import model.dto.AnmeldungenDTO;
+import model.dto.GradeDTO;
 import model.dto.PruefungDTO;
 import model.dto.PruefungInfoDTO;
 import model.dto.StudentDTO;
 import model.dto.TestatCheckDTO;
 import model.entitys.Aktuellepruefung;
 import model.entitys.Angemeldetepruefung;
+import model.entitys.GeschriebenePruefungen;
 import model.entitys.Student;
 import model.exceptions.EntryNotFoundException;
 
@@ -393,6 +395,40 @@ public class RegisterExam {
 			
 			return std;
 		}
+	    
+	    @POST
+	    @Path("benoten")
+	    public Number benoteStudent(GradeDTO g) {
+	    	
+	    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("de.fh-aachen.services");
+			this.em = emf.createEntityManager();
 
+			Query query = em.createQuery("SELECT a.id FROM Angemeldetepruefung a "
+					+ " WHERE a.aktuellePruefung.id = " + g.getAkt_id()
+					+ " AND a.teilnehmer.matrikelnummer = " + g.getStudent_id() );
+			Number a  = (Number) query.getSingleResult();
+			
+			Query angemeldetebyID = em.createQuery("SELECT a FROM Angemeldetepruefung a "
+					+ " WHERE a.id = " + a);
+			
+			@SuppressWarnings("unchecked")
+			List<Angemeldetepruefung> ls = angemeldetebyID.getResultList();
+			for(Angemeldetepruefung an : ls) {
+				System.out.println(an);
+				GeschriebenePruefungen gp = new GeschriebenePruefungen();
+				gp.setNote(g.getNote().doubleValue());
+				gp.setStatedTest(an);
+				gp.setVersuch(1);
+				
+				em.getTransaction().begin();
+				em.persist(gp);
+				em.flush();
+				
+				em.getTransaction().commit();
+				
+			}
+			
+			return a;
+	    }
 	
 }
