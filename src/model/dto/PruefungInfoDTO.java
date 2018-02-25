@@ -1,7 +1,8 @@
 package model.dto;
 
 public class PruefungInfoDTO {
-
+	
+	private Number id;
 	private String pruefung;
 	private Number semester;
 	private String datum;
@@ -12,8 +13,8 @@ public class PruefungInfoDTO {
 		
 	}
 
-	public PruefungInfoDTO(String pruefung, Number semester, String datum, String pruefer, Number status) {
-
+	public PruefungInfoDTO(Number id,String pruefung, Number semester, String datum, String pruefer, Number status) {
+		this.id = id;
 		this.pruefung = pruefung;
 		this.semester = semester;
 		this.datum = datum;
@@ -61,10 +62,20 @@ public class PruefungInfoDTO {
 		this.status = status;
 	}
 
+
+	public Number getId() {
+		return id;
+	}
+
+	public void setId(Number id) {
+		this.id = id;
+	}
+
 	@Override
 	public String toString() {
-		return "PruefungInfoDTO [pruefung=" + pruefung + ", semester=" + semester + ", datum=" + datum + ", pruefer="
-				+ pruefer + ", status=" + status + "]";
+		return "PruefungInfoDTO [id=" + id + ", pruefung=" + pruefung + ", semester=" + semester + ", datum=" + datum
+				+ ", pruefer=" + pruefer + ", status=" + status + "]";
 	}
+	
 	
 }
