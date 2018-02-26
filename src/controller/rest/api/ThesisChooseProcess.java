@@ -12,10 +12,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import controller.broker.EntityAccessBroker;
-import controller.exception.SaveFailedException;
 import model.dto.AdvertisementDTO;
 import model.dto.IdDTO;
 import model.dto.SelectedThesisThemeDTO;
+import model.exceptions.SaveFailedException;
 
 @Path("advertisement")
 public class ThesisChooseProcess {

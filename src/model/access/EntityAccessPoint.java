@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-import controller.exception.SaveFailedException;
 import model.dto.BenotungDTO;
 import model.dto.SubjectDTO;
 import model.entitys.Aktuellepruefung;
@@ -22,6 +21,7 @@ import model.entitys.Pruefungen;
 import model.entitys.Student;
 import model.entitys.VorgemerkteAushaenge;
 import model.exceptions.EntryNotFoundException;
+import model.exceptions.SaveFailedException;
 
 public class EntityAccessPoint {
 

@@ -1,4 +1,4 @@
-package controller.exception;
+package model.exceptions;
 
 public class SaveFailedException extends Exception {
 
