@@ -1,4 +1,4 @@
-package rest.api;
+package controller.rest.api;
 
 import java.util.List;
 

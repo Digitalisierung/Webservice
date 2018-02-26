@@ -1,4 +1,4 @@
-package rest.conf;
+package controller.rest.conf;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
