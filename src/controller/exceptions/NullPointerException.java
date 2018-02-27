@@ -11,6 +11,7 @@ public class NullPointerException extends Exception {
 		super();
 	}
 	
+	
 	public NullPointerException(String message) {
 		super(message);
 	}
