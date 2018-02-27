@@ -31,7 +31,7 @@ import model.entitys.Student;
 import model.exceptions.EntryNotFoundException;
 
 @Path("exams")
-public class RegisterExam {
+public class RegisterExamProcess {
 	
 	private EntityManager em;
 	

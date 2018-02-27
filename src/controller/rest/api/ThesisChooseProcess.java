@@ -17,58 +17,71 @@ import model.dto.IdDTO;
 import model.dto.SelectedThesisThemeDTO;
 import model.exceptions.SaveFailedException;
 
-@Path("advertisement")
+
+/**
+ * 
+ * @author Juri Rempel
+ *
+ */
+@Path(value="advertisement")
 public class ThesisChooseProcess {
 	EntityAccessBroker broker = new EntityAccessBroker();
 
-	/*
-	 * Prozess::Aushang erstellen
-	 * Beschreibung: 
-	 * 			Speichert neu erstellte Aushänge
+	/**
+	 * Camunda Prozess::Aushang erstellen. 
+	 * Beschreibung: Speichert neu erstellte Aushänge
+	 * 
+	 * @param announce beinhaltet Titel, Beschreibung, Scwierigkeitsgrad des Aushangs und Email Adresse des Professors. 
+	 * @return dieselbe Daten wie im announce + id Nummer unter welcher Aushang in der Datenbank gespeichert wurde.
 	 */
 	@POST
-	@Path("store")
-	@Produces( MediaType.APPLICATION_JSON )
+	@Path(value="store")
+	@Produces( value= {MediaType.APPLICATION_JSON} )
 	public AdvertisementDTO storeAdvertisement(AdvertisementDTO announce) {
 		return broker.storeAdvertisement(announce);
 		
 	}
 	
-	/*
-	 * Prozess::Bachelorarbeit Thema wählen (Liste anzeigen)
-	 * Beschreibung:
-	 * 			Gibt eine Liste mit allen aktivierten Aushängen zurück. (ohne jegliche selektierung)
+
+	/**
+	 * Camunda Prozess::Bachelorarbeit Thema wählen (Liste anzeigen)
+	 * Beschreibung: Gibt eine Liste mit allen aktivierten Aushängen zurück. (ohne jegliche selektierung)
+	 * 
+	 * @return Alle Aushaenge die aktuell sind
 	 */
 	@GET
-	@Path("list")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Path(value="list")
+	@Produces(value= {MediaType.APPLICATION_JSON})
 	public List<AdvertisementDTO> getAllActiveAdvertisements(){
 		return broker.findAllActiveAdvertisements();
 	}
 
 	
-	/*
-	 * Prozess::Aushang erstellen
-	 * Beschreibung:
-	 * 			Gibt eine Liste mit allen Aushängen zurück die vom Professor mit email stammen
+	/**
+	 * Camunda Prozess::Aushang erstellen
+	 * 
+	 * @param email Email Adresse des Professors
+	 * @return Alle Aushaenge die vom Professor mit {email} erstellt wurden
 	 */
 	@GET
-	@Path("list/{email}")
-	@Produces( MediaType.APPLICATION_JSON )
+	@Path(value="list/{email}")
+	@Produces( value= {MediaType.APPLICATION_JSON} )
 	public List<AdvertisementDTO> getAdvertisementsOfProf(@PathParam("email") String email) {	
 		return broker.findAllActiveAdvertisementsByProfessorEmail(email);
 		
 	}
 	
 	
-	/*
+	/**
 	 * Prozess::Aushang erstellen
-	 * Beschreibung:
-	 * 			Ändert bestehende Datensätze in der Tabelle 'Aushang'
+	 * Beschreibung: Ändert bestehende Datensätze in der Tabelle 'Aushang'
+	 * 
+	 * @param announce
+	 * @return announce
 	 */
 	@PUT
-	@Path("update")
-	@Produces( MediaType.APPLICATION_JSON )
+	@Path(value="update")
+	@Produces( value={MediaType.APPLICATION_JSON} )
 	public AdvertisementDTO updateAdvertisement(AdvertisementDTO announce) {
 		try{
 			return broker.update(announce);
@@ -79,14 +92,17 @@ public class ThesisChooseProcess {
 	}
 	
 	
-	/*
-	 * Prozess::Bachelorarbeit Thema wählen (Auswahl vermerken)
+	/**
+	 * Prozess::Bachelorarbeit Thema wählen (Auswahl vermerken).
 	 * Beschreibung:
 	 * 			Erstelt einen neuen Datensatz in der Tabelle 'Vorgemerkte_aushänge'
+	 * 
+	 * @param selExams
+	 * @return
 	 */
 	@POST
-	@Path("select")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Path(value="select")
+	@Produces(value= {MediaType.APPLICATION_JSON})
 	public SelectedThesisThemeDTO storeSelectedExam(SelectedThesisThemeDTO selExams){
 		SelectedThesisThemeDTO sttDTO = null;
 			try{
@@ -100,29 +116,32 @@ public class ThesisChooseProcess {
 	}
 	
 	
-	/*
-	 * Prozess::Bacheloarbeit Thema wählen (Auswal bestätigen)
+	/**
+	 * Prozess::Bacheloarbeit Thema wählen (Auswal bestätigen).
 	 * Beschreibung:
 	 * 			Vorgemerkter Aushang wird upgedated und betreuer_einverstanden auf 1 gesetzt
 	 * 
+	 * @param selExam
+	 * @return
 	 */
 	@PUT
-	@Path("agree")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Path(value="agree")
+	@Produces(value= {MediaType.APPLICATION_JSON})
 	public SelectedThesisThemeDTO agreeSelectedThesis(SelectedThesisThemeDTO selExam) {
 		return broker.update(selExam);
 		
 	}
 	
-	/*
-	 * Prozess::Bacheloarbeit Thema wählen (Thesis aus der Liste nehmen)
-	 * Beschreibung:
-	 * 			In der Tabelle Aushang Attribut 'aktiv' wird auf 0 gesetzt ==> somit erscheint Entry nicht mehr in der Liste
+	/**
+	 * Prozess::Bacheloarbeit Thema wählen (Thesis aus der Liste nehmen). 
+	 * Beschreibung: In der Tabelle Aushang Attribut 'aktiv' wird auf 0 gesetzt ==> somit erscheint Entry nicht mehr in der Liste
 	 * 
+	 * @param id
+	 * @return
 	 */
 	@PUT
-	@Path("deactivate")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Path(value="deactivate")
+	@Produces(value= {MediaType.APPLICATION_JSON})
 	public Integer deaktivateAdvertisement(IdDTO id) {
 		Integer count = 0;
 		try {
@@ -134,9 +153,14 @@ public class ThesisChooseProcess {
 		return count;
 	}
 	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@DELETE
-	@Path("delete/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Path(value="delete/{id}")
+	@Produces(value= {MediaType.APPLICATION_JSON})
 	public Integer deleteVorgemerkteAushaenge(@PathParam("id") Integer id) {
 		Integer def = new Integer(0);
 		if(broker.deleteVorgemerkteAushaengeById(id)) {
